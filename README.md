@@ -39,7 +39,7 @@ Welcome to the Cafeshop Management System! This system is designed to manage emp
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/melita-pereira/cafeshop-management-system.git
+   git clone https://github.com/melita-pereira/Cafeshop.git
    ```
 
 2. Import the project into your preferred Java IDE (e.g., IntelliJ IDEA, Eclipse).
