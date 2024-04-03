@@ -120,6 +120,9 @@ public class HelloController implements Initializable, AlertObserver{
     private AlertObserver alertObserver;
 
     database db = database.getInstance();
+    public HelloController(){
+        this.alertObserver = new AlertHandler();
+    }
 
 
     //to facilitate logins

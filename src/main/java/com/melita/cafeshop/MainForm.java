@@ -224,6 +224,9 @@ public class MainForm implements Initializable, AlertObserver {
     private AlertObserver alertObserver;
 
     database db = database.getInstance();
+    public MainForm(){
+        this.alertObserver = new AlertHandler();
+    }
 
     //displaying no. of customers
     public void dashboardDisplayNC() {

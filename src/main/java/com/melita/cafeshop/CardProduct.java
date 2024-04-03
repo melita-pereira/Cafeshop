@@ -48,7 +48,6 @@ public class CardProduct implements Initializable, AlertObserver {
     private Connection connect;
     private PreparedStatement prepare;
     private ResultSet result;
-    private Alert alert;
     private int qty;
     private double totalP;
     private double pr;
@@ -56,6 +55,9 @@ public class CardProduct implements Initializable, AlertObserver {
 
     //Initializing db -- Singleton design pattern
     database db = database.getInstance();
+    public CardProduct(){
+        this.alertObserver = new AlertHandler();
+    }
 
     //Definitions
     public void setData(productData prodData) {
