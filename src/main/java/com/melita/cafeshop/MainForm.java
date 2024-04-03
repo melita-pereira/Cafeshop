@@ -39,7 +39,7 @@ import java.util.*;
 import static javafx.scene.control.Alert.AlertType.*;
 
 //main page where dashboard, inventory, menu and customer data reside
-public class MainForm implements Initializable {
+public class MainForm implements Initializable, AlertObserver {
 
     @FXML
     private Button customers_btn;
@@ -205,14 +205,24 @@ public class MainForm implements Initializable {
 
     @FXML
     private Button displayOrder_btn;
-
-    private Alert alert;
     private Connection connect;
     private PreparedStatement prepare;
     private Statement statement;
     private ResultSet result;
     private Image image;
+    private int cID;
     private ObservableList<productData> cardListData = FXCollections.observableArrayList();
+    private ObservableList<customersData> customersListData;
+    private ObservableList<productData> inventoryListData;
+    private String[] typeList = {"Food", "Drinks", "Pantry", "Merchandise"};
+    private String[] statusList = {"Available", "Unavailable"};
+    private ObservableList<productData> menuOrderListData;
+    private int getid;
+    private double totalP;
+    private double amount;
+    private double change;
+    private AlertObserver alertObserver;
+
     database db = database.getInstance();
 
     //displaying no. of customers
@@ -446,14 +456,9 @@ public class MainForm implements Initializable {
             connect = db.getConnection();
 
             try {
+                boolean confirmed = showConfirmationDialog("Confirmation Message", "Do you want to update the given product?");
 
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Error Message");
-                alert.setHeaderText(null);
-                alert.setContentText("Are you sure you want to UPDATE Product ID: " + inventory_productID.getText() + "?");
-                Optional<ButtonType> option = alert.showAndWait();
-
-                if (option.get().equals(ButtonType.OK)) {
+                if (confirmed) {
                     prepare = connect.prepareStatement(updateData);
                     prepare.executeUpdate();
 
@@ -478,13 +483,9 @@ public class MainForm implements Initializable {
             showAlert(ERROR, "Error Message", "Please fill all blank fields!");
 
         } else {
-            alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Error Message");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to DELETE Product ID: " + inventory_productID.getText() + "?");
-            Optional<ButtonType> option = alert.showAndWait();
+            boolean confirmed = showConfirmationDialog("Confirmation Message", "Are you sure you want to delete this product?");
 
-            if (option.get().equals(ButtonType.OK)) {
+            if (confirmed) {
                 String deleteData = "DELETE FROM products WHERE id = " + data.id;
                 try {
                     prepare = connect.prepareStatement(deleteData);
@@ -576,8 +577,6 @@ public class MainForm implements Initializable {
     }
 
     // TO SHOW DATA ON OUR TABLE
-    private ObservableList<productData> inventoryListData;
-
     public void inventoryShowData() {
         inventoryListData = inventoryDataList();
 
@@ -619,8 +618,6 @@ public class MainForm implements Initializable {
     }
 
     //adding type of item
-    private String[] typeList = {"Food", "Drinks", "Pantry", "Merchandise"};
-
     public void inventoryTypeList() {
 
         List<String> typeL = new ArrayList<>();
@@ -634,8 +631,6 @@ public class MainForm implements Initializable {
     }
 
     //adding status of item
-    private String[] statusList = {"Available", "Unavailable"};
-
     public void inventoryStatusList() {
 
         List<String> statusL = new ArrayList<>();
@@ -753,8 +748,6 @@ public class MainForm implements Initializable {
         return listData;
     }
 
-    private ObservableList<productData> menuOrderListData;
-
     public void menuShowOrderData() {
         menuOrderListData = menuGetOrder();
 
@@ -764,7 +757,6 @@ public class MainForm implements Initializable {
 
         menu_tableView.setItems(menuOrderListData);
     }
-    private int getid;
 
     //to select an order on the order table
     public void menuSelectOrder() {
@@ -778,8 +770,6 @@ public class MainForm implements Initializable {
         getid = prod.getId();
 
     }
-
-    private double totalP;
 
     //to calculate total amount owed
     public void menuGetTotal() {
@@ -807,9 +797,6 @@ public class MainForm implements Initializable {
         menuGetTotal();
         menu_total.setText("$" + totalP);
     }
-
-    private double amount;
-    private double change;
 
     //to get the input of amount customer will pay so that change can be generated
     public void menuAmount() {
@@ -844,13 +831,9 @@ public class MainForm implements Initializable {
                 if (amount == 0) {
                     showAlert(ERROR, "Error Message", "Something went wrong!");
                 } else {
-                    alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Confirmation Message");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Are you sure?");
-                    Optional<ButtonType> option = alert.showAndWait();
+                    boolean confirmed = showConfirmationDialog("Confirmation Message", "Do you want to proceed to payment?");
 
-                    if (option.get().equals(ButtonType.OK)) {
+                    if (confirmed) {
                         customerID();
                         menuGetTotal();
                         prepare = connect.prepareStatement(insertPay);
@@ -890,13 +873,9 @@ public class MainForm implements Initializable {
             String deleteData = "DELETE FROM customers WHERE id = " + getid;
             connect = db.getConnection();
             try {
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Confirmation Message");
-                alert.setHeaderText(null);
-                alert.setContentText("Are you sure you want to delete this order?");
-                Optional<ButtonType> option = alert.showAndWait();
+                boolean confirmed = showConfirmationDialog("Confirmation Message", "Are you sure you want to delete this order?");
 
-                if (option.get().equals(ButtonType.OK)) {
+                if (confirmed) {
                     prepare = connect.prepareStatement(deleteData);
                     prepare.executeUpdate();
                 }
@@ -913,10 +892,7 @@ public class MainForm implements Initializable {
     public void menuReceiptBtn() {
 
         if (totalP == 0 || menu_amount.getText().isEmpty()) {
-            alert = new Alert(ERROR);
-            alert.setTitle("Error Message");
-            alert.setContentText("Please order first");
-            alert.showAndWait();
+            showAlert(ERROR, "Error Message", "Please order first!");
         } else {
             HashMap map = new HashMap();
             map.put("getReceipt", (cID - 1));
@@ -948,8 +924,6 @@ public class MainForm implements Initializable {
         menu_amount.setText("");
         menu_change.setText("$0.0");
     }
-
-    private int cID;
 
     //to enter data of orders in customer table
     public void customerID() {
@@ -1014,8 +988,6 @@ public class MainForm implements Initializable {
         return listData;
     }
 
-    private ObservableList<customersData> customersListData;
-
     public void customersShowData() {
         customersListData = customersDataList();
 
@@ -1076,13 +1048,9 @@ public class MainForm implements Initializable {
     public void logout() {
 
         try {
-            alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Error Message");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to logout?");
-            Optional<ButtonType> option = alert.showAndWait();
+            boolean confirmed = showConfirmationDialog("Confirmation Message", "Are you sure you want to logout?");
 
-            if (option.get().equals(ButtonType.OK)) {
+            if (confirmed) {
 
                 // TO HIDE MAIN FORM
                 logout_btn.getScene().getWindow().hide();
@@ -1109,12 +1077,13 @@ public class MainForm implements Initializable {
     }
 
     //alerts or pop-ups
-    private static void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    public void showAlert(Alert.AlertType alertType, String title, String message) {
+        alertObserver.showAlert(alertType, title, message);
+    }
+
+    @Override
+    public boolean showConfirmationDialog(String title, String message) {
+        return alertObserver.showConfirmationDialog(title, message);
     }
 
     @Override

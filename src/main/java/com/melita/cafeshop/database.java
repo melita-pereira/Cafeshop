@@ -14,7 +14,7 @@ public class database {
 
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            connect = DriverManager.getConnection("jdbc:mysql://localhost/cafeshop", "root", ""); // LINK YOUR DATABASE
+            connect = DriverManager.getConnection("jdbc:mysql://localhost/cafeshop", "root", ""); // LINK DATABASE
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -33,7 +33,7 @@ import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
 //manages the base page which is the login page, and handles register page, forgot password and set new password page
-public class HelloController implements Initializable{
+public class HelloController implements Initializable, AlertObserver{
 
     @FXML
     private Label alreadyHave;
@@ -116,8 +116,8 @@ public class HelloController implements Initializable{
 
     private PreparedStatement prepare;
     private ResultSet result;
-    private Alert alert;
     private Connection connect;
+    private AlertObserver alertObserver;
 
     database db = database.getInstance();
 
@@ -376,12 +376,13 @@ public class HelloController implements Initializable{
     }
 
     //alerts or pop-ups
-    private static void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    public void showAlert(Alert.AlertType alertType, String title, String message) {
+        alertObserver.showAlert(alertType, title, message);
+    }
+
+    @Override
+    public boolean showConfirmationDialog(String title, String message) {
+        return alertObserver.showConfirmationDialog(title, message);
     }
 
     @Override
