@@ -39,7 +39,7 @@ import java.util.*;
 import static javafx.scene.control.Alert.AlertType.*;
 
 //main page where dashboard, inventory, menu and customer data reside
-public class MainForm implements Initializable, AlertObserver {
+public class MainForm implements Initializable{
 
     @FXML
     private Button customers_btn;
@@ -221,11 +221,11 @@ public class MainForm implements Initializable, AlertObserver {
     private double totalP;
     private double amount;
     private double change;
-    private AlertObserver alertObserver;
+    private AlertHandler alertHandler;
 
     database db = database.getInstance();
     public MainForm(){
-        this.alertObserver = new AlertHandler();
+        this.alertHandler = new AlertHandler();
     }
 
     //displaying no. of customers
@@ -826,15 +826,18 @@ public class MainForm implements Initializable, AlertObserver {
             menuGetTotal();
             String insertPay = "INSERT INTO receipt (customer_id, total, date, em_username) "
                     + "VALUES(?,?,?,?)";
+            System.out.println("Total price: "+ totalP);
 
             connect = db.getConnection();
 
             try {
 
                 if (amount == 0) {
+                    System.out.println("Amount entered: "+ amount);
                     showAlert(ERROR, "Error Message", "Something went wrong!");
                 } else {
                     boolean confirmed = showConfirmationDialog("Confirmation Message", "Do you want to proceed to payment?");
+                    System.out.println("Confirmation :" + confirmed);
 
                     if (confirmed) {
                         customerID();
@@ -1081,13 +1084,13 @@ public class MainForm implements Initializable, AlertObserver {
 
     //alerts or pop-ups
     public void showAlert(Alert.AlertType alertType, String title, String message) {
-        alertObserver.showAlert(alertType, title, message);
+        alertHandler.showAlert(alertType, title, message);
     }
 
-    @Override
     public boolean showConfirmationDialog(String title, String message) {
-        return alertObserver.showConfirmationDialog(title, message);
+        return alertHandler.showConfirmationDialog(title, message);
     }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

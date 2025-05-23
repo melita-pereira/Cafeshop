@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
-public class CardProduct implements Initializable, AlertObserver {
+public class CardProduct implements Initializable {
 
     @FXML
     private AnchorPane card_form;
@@ -51,12 +51,10 @@ public class CardProduct implements Initializable, AlertObserver {
     private int qty;
     private double totalP;
     private double pr;
-    private AlertObserver alertObserver;
 
     //Initializing db -- Singleton design pattern
     database db = database.getInstance();
     public CardProduct(){
-        this.alertObserver = new AlertHandler();
     }
 
     //Definitions
@@ -192,13 +190,13 @@ public class CardProduct implements Initializable, AlertObserver {
 
     //alerts or pop-ups
     public void showAlert(Alert.AlertType alertType, String title, String message) {
-        alertObserver.showAlert(alertType, title, message);
+        AlertHandler.showAlert(alertType, title, message);
     }
 
-    @Override
     public boolean showConfirmationDialog(String title, String message) {
-        return alertObserver.showConfirmationDialog(title, message);
+        return AlertHandler.showConfirmationDialog(title, message);
     }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

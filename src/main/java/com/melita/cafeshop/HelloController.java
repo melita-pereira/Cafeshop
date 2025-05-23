@@ -4,36 +4,26 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
 //manages the base page which is the login page, and handles register page, forgot password and set new password page
-public class HelloController implements Initializable, AlertObserver{
+public class HelloController implements Initializable{
 
     @FXML
     private Label alreadyHave;
@@ -117,11 +107,11 @@ public class HelloController implements Initializable, AlertObserver{
     private PreparedStatement prepare;
     private ResultSet result;
     private Connection connect;
-    private AlertObserver alertObserver;
+    private AlertHandler alertHandler;
 
     database db = database.getInstance();
     public HelloController(){
-        this.alertObserver = new AlertHandler();
+        this.alertHandler = new AlertHandler();
     }
 
 
@@ -380,12 +370,11 @@ public class HelloController implements Initializable, AlertObserver{
 
     //alerts or pop-ups
     public void showAlert(Alert.AlertType alertType, String title, String message) {
-        alertObserver.showAlert(alertType, title, message);
+        alertHandler.showAlert(alertType, title, message);
     }
 
-    @Override
     public boolean showConfirmationDialog(String title, String message) {
-        return alertObserver.showConfirmationDialog(title, message);
+        return alertHandler.showConfirmationDialog(title, message);
     }
 
     @Override
